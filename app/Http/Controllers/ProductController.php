@@ -16,7 +16,9 @@ class ProductController extends Controller
     public function index()
     {
         $categories = Category::all();
-        $products = Product::with('category')->get();
+        $params = request()->except('_except');
+
+        $products = Product::filter($params)->with('category')->get();
 
         $kode = mt_rand(1111, 9999);
 
@@ -76,6 +78,7 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $product->update([
+            'kode' => $request->kode,
             'name' => $request->name,
             'qty' => $request->qty,
             'category_id' => $request->category_id
@@ -100,9 +103,9 @@ class ProductController extends Controller
     }
 
     // get product by kode
-    public function getProduct()
+    public function getProduct(Request $request)
     {
-        $product = Product::with('category')->where('kode', @$_GET['kode'])->first();
+        $product = Product::with('category')->where('kode', $request->kode)->first();
 
         if($product) {
             return response()->json([

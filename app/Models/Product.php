@@ -14,4 +14,14 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    // filter
+    public function scopeFilter($query, $params)
+    {
+        if (isset($params['q'])) {
+            $query->where('kode', 'like', '%' . $params['q'] . '%');
+        }
+
+        return $query;
+    }
 }

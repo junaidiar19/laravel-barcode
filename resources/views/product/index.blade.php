@@ -7,24 +7,28 @@
     let alert = $("#alert");
 
     $.ajax({
-      url: '{{ route('product.getProduct') }}?kode=' + value,
+      url: '{{ route('product.getProduct') }}',
+      data: {
+        'kode': value
+      },
       type: 'GET',
       success: function(result) {
         let data = result.data;
-
+        
         if(result.status == 'success') {
-          $('#name').text(data.name);
-          $('#qty').text(data.qty);
-          $('#category').text(data.category.name);
+          $('#name').val(data.name);
+          $('#qty').val(data.qty);
+          $('#category').val(data.category.name);
 
           alert.html('<i class="fas fa-check-circle me-1"></i>Produk Ditemukan');
         } else {
-          $('#name').text('...');
-          $('#qty').text('...');
-          $('#category').text('...');
+          $('#name').val();
+          $('#qty').val();
+          $('#category').val();
           alert.html('')
         }
       }
+
     });
   }
 </script>
@@ -36,21 +40,21 @@
       <div class="card-body">
         <div class="form-group mb-3">
           <label class="fw-bold mb-1">Scan Barcode:</label>
-          <input type="number" class="form-control" onkeyup="getProduct(this.value)" autocomplete="off" autofocus placeholder="Masukan Kode">
+          <input type="number" class="form-control" onkeyup="getProduct(this.value)" autocomplete="off" placeholder="Masukan Kode">
           <span class="text-sm text-success" id="alert"></span>
         </div>
         <div class="row">
           <div class="col-md-4">
             <p class="text-sm text-muted mb-0">Nama</p>
-            <span class="fw-semibold" id="name">...</span>
+            <input class="form-control" readonly id="name">
           </div>
           <div class="col-md-3">
             <p class="text-sm text-muted mb-0">Qty</p>
-            <span class="fw-semibold" id="qty">...</span>
+            <input class="form-control" readonly id="qty">
           </div>
           <div class="col-md-3">
             <p class="text-sm text-muted mb-0">Kategori</p>
-            <span class="fw-semibold" id="category">...</span>
+            <input class="form-control" readonly id="category">
           </div>
         </div>
       </div>
@@ -66,6 +70,14 @@
             {{ session('success') }}
           </div>
         @endif
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <input type="text" class="form-control" name="q" placeholder="Masukan Kode" id="masukan-kode" autofocus>
+            </div>
+            <div class="col-md-12">
+              <button data-bs-toggle="modal" data-bs-target="#enter" id="button-enter" class="btn btn-warning d-none">Enter</button>
+            </div>
+          </div>
         <div class="table-responsive">
           <table class="table table-striped table-bordered" style="white-space: nowrap">
             <thead>
@@ -145,6 +157,74 @@
     </div>
   </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="enter" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title" id="staticBackdropLabel">Detail Product</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-4">
+            <p class="text-sm text-muted mb-0">Nama</p>
+            <span class="fw-semibold" id="name-modal">...</span>
+          </div>
+          <div class="col-md-3">
+            <p class="text-sm text-muted mb-0">Qty</p>
+            <span class="fw-semibold" id="qty-modal">...</span>
+          </div>
+          <div class="col-md-3">
+            <p class="text-sm text-muted mb-0">Kategori</p>
+            <span class="fw-semibold" id="category-modal">...</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@push('after-scripts')
+  <script>
+    $("#masukan-kode").keyup(function(event) {
+      // get this value
+      var kode = $(this).val();
+      
+      if (event.keyCode === 13) {
+          $("#button-enter").click();
+
+          // ajax
+          $.ajax({
+            url: '{{ route('product.getProduct') }}',
+            data: {
+              'kode': kode
+            },
+            type: 'GET',
+            success: function(result) {
+              let data = result.data;
+              
+              if(result.status == 'success') {
+                $('#name-modal').text(data.name);
+                $('#qty-modal').text(data.qty);
+                $('#category-modal').text(data.category.name);
+              } else {
+                $('#name-modal').text('...');
+                $('#qty-modal').text('...');
+                $('#category-modal').text('...');
+              }
+          }
+      });
+
+      }
+  });
+  </script>
+@endpush
 
 @include('partials.modal')
 @endsection

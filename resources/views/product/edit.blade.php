@@ -17,16 +17,20 @@
           @csrf
           @method('put')
           <div class="form-group mb-3">
+            <label for="name">Kode</label>
+            <input type="text" name="kode" class="form-control" value="{{ $product->kode }}">
+          </div>
+          <div class="form-group mb-3">
             <label for="name">Nama</label>
-            <input type="text" name="name" id="name" class="form-control" value="{{ $product->name }}">
+            <input type="text" name="name" class="form-control" value="{{ $product->name }}">
           </div>
           <div class="form-group mb-3">
             <label for="qty">Qty</label>
-            <input type="number" name="qty" id="qty" class="form-control" value="{{ $product->qty }}">
+            <input type="number" name="qty" class="form-control" value="{{ $product->qty }}">
           </div>
           <div class="form-group mb-3">
             <label for="category_id">Kategori</label>
-            <select name="category_id" id="category_id" class="form-control">
+            <select name="category_id" class="form-control">
               @foreach ($categories as $category)
                 <option value="{{ $category->id }}" {{ ($category->id == $product->category_id) ? 'selected' : '' }}>{{ $category->name }}</option>
               @endforeach
