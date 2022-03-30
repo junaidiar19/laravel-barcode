@@ -1,46 +1,13 @@
 @extends('layouts.app')
 @section('content')
 
-@push('after-scripts')
-<script>
-  function getProduct(value) {
-    let alert = $("#alert");
-
-    $.ajax({
-      url: '{{ route('product.getProduct') }}',
-      data: {
-        'kode': value
-      },
-      type: 'GET',
-      success: function(result) {
-        let data = result.data;
-        
-        if(result.status == 'success') {
-          $('#name').val(data.name);
-          $('#qty').val(data.qty);
-          $('#category').val(data.category.name);
-
-          alert.html('<i class="fas fa-check-circle me-1"></i>Produk Ditemukan');
-        } else {
-          $('#name').val();
-          $('#qty').val();
-          $('#category').val();
-          alert.html('')
-        }
-      }
-
-    });
-  }
-</script>
-@endpush
-
 <div class="row">
   <div class="col-md-8">
     <div class="card mb-4">
       <div class="card-body">
         <div class="form-group mb-3">
           <label class="fw-bold mb-1">Scan Barcode:</label>
-          <input type="number" class="form-control" onkeyup="getProduct(this.value)" autocomplete="off" placeholder="Masukan Kode">
+          <input type="number" class="form-control" id="scan-barcode" autocomplete="off" placeholder="Masukan Kode">
           <span class="text-sm text-success" id="alert"></span>
         </div>
         <div class="row">
@@ -191,39 +158,78 @@
 </div>
 
 @push('after-scripts')
-  <script>
-    $("#masukan-kode").keyup(function(event) {
-      // get this value
-      var kode = $(this).val();
-      
-      if (event.keyCode === 13) {
-          $("#button-enter").click();
+<script>
+  $("#scan-barcode").keyup(function(event) {
 
-          // ajax
-          $.ajax({
-            url: '{{ route('product.getProduct') }}',
-            data: {
-              'kode': kode
-            },
-            type: 'GET',
-            success: function(result) {
-              let data = result.data;
-              
-              if(result.status == 'success') {
-                $('#name-modal').text(data.name);
-                $('#qty-modal').text(data.qty);
-                $('#category-modal').text(data.category.name);
-              } else {
-                $('#name-modal').text('...');
-                $('#qty-modal').text('...');
-                $('#category-modal').text('...');
-              }
+    // get this value
+    var kode = $(this).val();
+
+    // alert id
+    let alert = $("#alert");
+    
+    // ketika enter
+    if (event.keyCode === 13) {
+      $.ajax({
+        url: '{{ route('product.getProduct') }}',
+        data: {
+          'kode': kode
+        },
+        type: 'GET',
+        success: function(result) {
+          let data = result.data;
+          
+          if(result.status == 'success') {
+            $('#name').val(data.name);
+            $('#qty').val(data.qty);
+            $('#category').val(data.category.name);
+
+            alert.html('<i class="fas fa-check-circle me-1"></i>Produk Ditemukan');
+          } else {
+            $('#name').val();
+            $('#qty').val();
+            $('#category').val();
+            alert.html('')
           }
+        }
       });
-
-      }
+    }
+  
   });
-  </script>
+</script>
+<script>
+  $("#masukan-kode").keyup(function(event) {
+    // get this value
+    var kode = $(this).val();
+    
+    // ketika enter
+    if (event.keyCode === 13) {
+      $("#button-enter").click();
+
+      // ajax
+      $.ajax({
+        url: '{{ route('product.getProduct') }}',
+        data: {
+          'kode': kode
+        },
+        type: 'GET',
+        success: function(result) {
+          let data = result.data;
+          
+          if(result.status == 'success') {
+            $('#name-modal').text(data.name);
+            $('#qty-modal').text(data.qty);
+            $('#category-modal').text(data.category.name);
+          } else {
+            $('#name-modal').text('...');
+            $('#qty-modal').text('...');
+            $('#category-modal').text('...');
+          }
+      }
+    });
+
+    }
+});
+</script>
 @endpush
 
 @include('partials.modal')
